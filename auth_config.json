@@ -1,0 +1,6 @@
+{
+  "domain": "dev-ja6utjro.us.auth0.com",
+  "clientId": "EmjEOeOEzj536BfxMwKIcTJsbE9QTbbv",
+  "audience": "http://localhost:3000",
+  "scope" : "read:tester"
+}

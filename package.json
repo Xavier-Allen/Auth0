@@ -1,0 +1,26 @@
+{
+  "name": "auth0",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "auth0-js": "^9.19.0",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "express-jwt": "^7.7.5",
+    "express-jwt-authz": "^2.4.1",
+    "express-oauth2-jwt-bearer": "^1.1.0",
+    "jwks-rsa": "^2.1.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
