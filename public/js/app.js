@@ -65,10 +65,10 @@ const configureClient = async () => {
       domain: config.domain,
       client_id: config.clientId,
       audience: config.audience,
-      scope: 'read:tester',
+      scope: 'read:tester read:clients',
       token_dialect: 'access_token_authz',
       advancedOptions: {
-        defaultScope: 'email read:tester' // change the scopes that are applied to every authz request. **Note**: `openid` is always specified regardless of this setting
+        defaultScope: 'email read:tester read:clients' // change the scopes that are applied to every authz request. **Note**: `openid` is always specified regardless of this setting
       }
     });
   };
@@ -77,7 +77,7 @@ const configureClient = async () => {
 const login = async () => {
     await auth0.loginWithRedirect({
       redirect_uri: window.location.origin,
-      scope: ["read:tester", "read:actions"],
+      scope: ["read:tester", "read:actions", "read:clients"],
     });
   };
 
