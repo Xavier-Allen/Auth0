@@ -54,7 +54,7 @@ const MgtApiOptions = {
 
 const clientOptions = {
   method: 'GET',
-  url: 
+  url: 'https://dev-ja6utjro.us.auth0.com/',
 }
 
 async function getMgtToken () {
@@ -64,6 +64,7 @@ async function getMgtToken () {
 };
 async function fetchClientData() {
   let mgtToken = await getMgtToken();
+  console.log(mgtToken)
   let clients = await axios.request(clientOptions);
   console.log(clients);
 }
