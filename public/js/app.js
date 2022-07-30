@@ -1,5 +1,6 @@
 let auth0 = null;
 
+
 const fetchAuthConfig = () => fetch("/auth_config.json");
 
 window.onload = async () => {
@@ -134,3 +135,7 @@ const logout = () => {
       console.error(e);
     }
   };
+
+  function testCall() {
+    console.log('THIS WOOOOOORKED');
+  }

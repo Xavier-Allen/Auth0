@@ -7,6 +7,7 @@ var axios = require("axios").default;
 const bodyParser = require('body-parser');
 const checkScopes = requiredScopes('read:tester');
 
+
 const checkJwt = auth( {
   audience: 'http://localhost:3000',
   issuerBaseURL:'https://dev-ja6utjro.us.auth0.com/'
@@ -37,9 +38,8 @@ app.get('/api/private', checkJwt, function(req, res) {
 });
 
 app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res )
-{
+{  
   console.log('Here in private');
-
 const MgtApiOptions = {
   method: 'POST',
   url: 'https://dev-ja6utjro.us.auth0.com/oauth/token',
@@ -52,10 +52,7 @@ const MgtApiOptions = {
   })
 };
 
-const clientOptions = {
-  method: 'GET',
-  url: 'https://dev-ja6utjro.us.auth0.com/',
-}
+
 
 async function getMgtToken () {
   const res = await axios.request(MgtApiOptions);
@@ -64,24 +61,43 @@ async function getMgtToken () {
 };
 async function fetchClientData() {
   let mgtToken = await getMgtToken();
-  console.log(mgtToken)
+  const clientOptions = {
+    method: 'GET',
+    url: 'https://dev-ja6utjro.us.auth0.com/api/v2/clients',
+    headers: {'Authorization' : `Bearer ${mgtToken}`}
+  }
+  
+  // console.log(mgtToken)
   let clients = await axios.request(clientOptions);
-  console.log(clients);
+
+  // Pulls the names of each application in tenet and appends it to the DOM
+  let apps = clients.data
+  for(let i = 0; i < apps.length; i++) {
+    let appNames = apps[i]["name"];
+     console.log(appNames);
+  }
 }
+
+async function fetchActions() {
+  let actionTriggers = [];
+  let mgtToken = await getMgtToken();
+  const actionsOptions = {
+    method: 'GET',
+    url: 'https://dev-ja6utjro.us.auth0.com/api/v2/actions/actions',
+    headers: {'Authorization' : `Bearer ${mgtToken}`}
+  }
+  let actions = await axios.request(actionsOptions);
+  let apps = actions.data["actions"];
+  for(let i = 0; i < apps.length; i++) {
+    let actionName_Triggers = {"Action Name" : apps[i]["name"], "Supported Triggers" : apps[i]["supported_triggers"][0].id}
+    actionTriggers.push(actionName_Triggers);
+  }
+
+  console.log(actionTriggers);
+}
+
+fetchActions()
 fetchClientData()
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
