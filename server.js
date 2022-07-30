@@ -6,6 +6,7 @@ const cors = require('cors');
 var axios = require("axios").default;
 const bodyParser = require('body-parser');
 const checkScopes = requiredScopes('read:tester');
+let actionNames, clientNames;
 
 
 const checkJwt = auth( {
@@ -37,72 +38,80 @@ app.get('/api/private', checkJwt, function(req, res) {
   });
 });
 
-app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res )
-{  
-  console.log('Here in private');
-const MgtApiOptions = {
-  method: 'POST',
-  url: 'https://dev-ja6utjro.us.auth0.com/oauth/token',
-  headers: {'content-type': 'application/x-www-form-urlencoded'},
-  data: new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: '6kNnizBGAeOa5lKqUoh8D9QCbIdHhKpE',
-    client_secret: 'bfgN1IcgJm19yBTvUgutwXjTzg7PxSpp9dm5WTILeebvkSy_6UB7QPNgCBS2br1D',
-    audience: 'https://dev-ja6utjro.us.auth0.com/api/v2/'
-  })
-};
+app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {  
 
-
-
-async function getMgtToken () {
-  const res = await axios.request(MgtApiOptions);
-  const token = res.data['access_token']
-  return token
-};
-async function fetchClientData() {
-  let mgtToken = await getMgtToken();
-  const clientOptions = {
-    method: 'GET',
-    url: 'https://dev-ja6utjro.us.auth0.com/api/v2/clients',
-    headers: {'Authorization' : `Bearer ${mgtToken}`}
+  let fact = {txt: 'Here in private'};
+  const MgtApiOptions = {
+    method: 'POST',
+    url: 'https://dev-ja6utjro.us.auth0.com/oauth/token',
+    headers: {'content-type': 'application/x-www-form-urlencoded'},
+    data: new URLSearchParams({
+      grant_type: 'client_credentials',
+      client_id: '6kNnizBGAeOa5lKqUoh8D9QCbIdHhKpE',
+      client_secret: 'bfgN1IcgJm19yBTvUgutwXjTzg7PxSpp9dm5WTILeebvkSy_6UB7QPNgCBS2br1D',
+      audience: 'https://dev-ja6utjro.us.auth0.com/api/v2/'
+    })
+  };
+  
+  
+  async function getMgtToken () {
+    const res = await axios.request(MgtApiOptions);
+    const token = res.data['access_token']
+    return token
+  };
+  async function fetchClientData() {
+    let mgtToken = await getMgtToken();
+    const clientOptions = {
+      method: 'GET',
+      url: 'https://dev-ja6utjro.us.auth0.com/api/v2/clients',
+      headers: {'Authorization' : `Bearer ${mgtToken}`}
+    }
+    
+    // console.log(mgtToken)
+    let clients = await axios.request(clientOptions);
+    let appNamesArr = []
+  
+    // Pulls the names of each application in tenet and appends it to appNamesArr
+    let apps = clients.data
+    for(let i = 0; i < apps.length; i++) {
+      let appNames = apps[i]["name"];
+       appNamesArr.push(appNames);
+    }
+    return appNamesArr;
   }
   
-  // console.log(mgtToken)
-  let clients = await axios.request(clientOptions);
 
-  // Pulls the names of each application in tenet and appends it to the DOM
-  let apps = clients.data
-  for(let i = 0; i < apps.length; i++) {
-    let appNames = apps[i]["name"];
-     console.log(appNames);
+  //
+  async function fetchActions() {
+    let actionTriggers = [];
+    let mgtToken = await getMgtToken();
+    const actionsOptions = {
+      method: 'GET',
+      url: 'https://dev-ja6utjro.us.auth0.com/api/v2/actions/actions',
+      headers: {'Authorization' : `Bearer ${mgtToken}`}
+    }
+    let actions = await axios.request(actionsOptions);
+    let apps = actions.data["actions"];
+    for(let i = 0; i < apps.length; i++) {
+      let actionName_Triggers = {"Action Name" : apps[i]["name"], "Supported Triggers" : apps[i]["supported_triggers"][0].id}
+      actionTriggers.push(actionName_Triggers);
+    }
+  
+    return actionTriggers;
   }
-}
+  
+ async function getVariables() {
+  actionNames = await fetchActions();
+  clientNames = await fetchClientData();
+  return actionNames, clientNames
+ }
+ getVariables();
 
-async function fetchActions() {
-  let actionTriggers = [];
-  let mgtToken = await getMgtToken();
-  const actionsOptions = {
-    method: 'GET',
-    url: 'https://dev-ja6utjro.us.auth0.com/api/v2/actions/actions',
-    headers: {'Authorization' : `Bearer ${mgtToken}`}
-  }
-  let actions = await axios.request(actionsOptions);
-  let apps = actions.data["actions"];
-  for(let i = 0; i < apps.length; i++) {
-    let actionName_Triggers = {"Action Name" : apps[i]["name"], "Supported Triggers" : apps[i]["supported_triggers"][0].id}
-    actionTriggers.push(actionName_Triggers);
-  }
-
-  console.log(actionTriggers);
-}
-
-fetchActions()
-fetchClientData()
-
-
-
-
-
+  res.json({
+    obj: fact,
+    actionNames: actionNames,
+    clientNames: clientNames
+  })
 });
 
 app.get("/auth_config.json", (req, res) => {

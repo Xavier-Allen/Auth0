@@ -1,3 +1,5 @@
+// const e = require("express");
+
 let auth0 = null;
 
 
@@ -104,6 +106,7 @@ const logout = () => {
   
       // Fetch the JSON result
       const responseData = await response.json();
+      console.log(responseData)
   
       // Display the result in the output element
       const responseElement = document.getElementById("api-call-result");
@@ -136,6 +139,3 @@ const logout = () => {
     }
   };
 
-  function testCall() {
-    console.log('THIS WOOOOOORKED');
-  }
