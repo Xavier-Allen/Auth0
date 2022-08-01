@@ -1,7 +1,4 @@
-// const e = require("express");
-
 let auth0 = null;
-
 
 const fetchAuthConfig = () => fetch("/auth_config.json");
 
@@ -13,7 +10,6 @@ window.onload = async () => {
     const isAuthenticated = await auth0.isAuthenticated();
 
     if (isAuthenticated) {
-      // show the gated content
       return;
     }
 
@@ -31,8 +27,7 @@ window.onload = async () => {
   };
   
   
- // ...
-
+ // Updates the UI after credientals are authorized
 const updateUI = async () => { 
     const isAuthenticated = await auth0.isAuthenticated();
   
@@ -56,9 +51,6 @@ const updateUI = async () => {
       document.getElementById("gated-content").classList.add("hidden");
     }
   };
-  
-  // ..
-  // ..
   
 const configureClient = async () => {
     const response = await fetchAuthConfig();
@@ -90,6 +82,7 @@ const logout = () => {
     });
   };
 
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
   const callApi = async () => {
     try {
   
@@ -110,7 +103,6 @@ const logout = () => {
   
       // Display the result in the output element
       const responseElement = document.getElementById("api-call-result");
-  
       responseElement.innerText = JSON.stringify(responseData, {}, 2);
   
   } catch (e) {
@@ -120,7 +112,6 @@ const logout = () => {
 
   const callManagementApi = async () => {
     try {
-  
       const token = await auth0.getTokenSilently();
       const response = await fetch("/api/private-scoped", {
         headers: {
@@ -128,11 +119,10 @@ const logout = () => {
         }
       });
   
-      // Fetch the JSON result
+      // Fetch the JSON result and append it to the DOM
       const responseData = await response.json();
       const responseElement = document.getElementById("api-call-result");
-  
-      responseElement.innerText = JSON.stringify(responseData, {}, 2);
+      responseElement.innerText = JSON.stringify(await responseData, {}, 2);
   
   } catch (e) {
       console.error(e);

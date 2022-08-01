@@ -15,7 +15,7 @@ const checkJwt = auth( {
 })
 
 
-//------------------------------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 app.use(express.static(join(__dirname, "public")));
 app.use(cors());
 app.use(bodyParser.json());
@@ -23,7 +23,7 @@ app.use(bodyParser.urlencoded({
   extended: true
 } ) );
 
-//------------------------------------------------------------------------------------------------------------------------------------//
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 // This route doesn't need authentication
 app.get('/api/public', function(req, res) {
   res.json({
@@ -38,9 +38,10 @@ app.get('/api/private', checkJwt, function(req, res) {
   });
 });
 
+
+// ROLE-BASED ACCESS CONTROLED SCOPE
 app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {  
 
-  let fact = {txt: 'Here in private'};
   const MgtApiOptions = {
     method: 'POST',
     url: 'https://dev-ja6utjro.us.auth0.com/oauth/token',
@@ -53,12 +54,12 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
     })
   };
   
-  
   async function getMgtToken () {
     const res = await axios.request(MgtApiOptions);
     const token = res.data['access_token']
     return token
   };
+
   async function fetchClientData() {
     let mgtToken = await getMgtToken();
     const clientOptions = {
@@ -67,11 +68,10 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
       headers: {'Authorization' : `Bearer ${mgtToken}`}
     }
     
-    // console.log(mgtToken)
     let clients = await axios.request(clientOptions);
     let appNamesArr = []
   
-    // Pulls the names of each application in tenet and appends it to appNamesArr
+    // Pulls the names of each application in tenet and return result
     let apps = clients.data
     for(let i = 0; i < apps.length; i++) {
       let appNames = apps[i]["name"];
@@ -81,7 +81,7 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
   }
   
 
-  //
+  // Fetches the actions after using Mgt API Token
   async function fetchActions() {
     let actionTriggers = [];
     let mgtToken = await getMgtToken();
@@ -90,6 +90,7 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
       url: 'https://dev-ja6utjro.us.auth0.com/api/v2/actions/actions',
       headers: {'Authorization' : `Bearer ${mgtToken}`}
     }
+  // Extract Actions from API and Return that result
     let actions = await axios.request(actionsOptions);
     let apps = actions.data["actions"];
     for(let i = 0; i < apps.length; i++) {
@@ -99,7 +100,7 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
   
     return actionTriggers;
   }
-  
+
  async function getVariables() {
   actionNames = await fetchActions();
   clientNames = await fetchClientData();
@@ -107,8 +108,8 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
  }
  getVariables();
 
+ // Returns the application names and actions/triggers in JSON format
   res.json({
-    obj: fact,
     actionNames: actionNames,
     clientNames: clientNames
   })
