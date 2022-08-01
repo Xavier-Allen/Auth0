@@ -8,7 +8,6 @@ window.onload = async () => {
     updateUI();
 
     const isAuthenticated = await auth0.isAuthenticated();
-
     if (isAuthenticated) {
       return;
     }
@@ -18,7 +17,6 @@ window.onload = async () => {
   
       // Process the login state
       await auth0.handleRedirectCallback();
-      
       updateUI();
   
       // Use replaceState to redirect the user away and remove the querystring parameters
@@ -88,16 +86,12 @@ const logout = () => {
   
       // Get the access token from the Auth0 client
       const token = await auth0.getTokenSilently();
-  
-      // Make the call to the API, setting the token
-      // in the Authorization header
       const response = await fetch("/api/private", {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
   
-      // Fetch the JSON result
       const responseData = await response.json();
       console.log(responseData)
   
