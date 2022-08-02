@@ -106,6 +106,9 @@ const logout = () => {
 
   const callManagementApi = async () => {
     try {
+      let resultsHash = {};
+      let clientsIDs = [];
+      let actionsCode = [];
       const token = await auth0.getTokenSilently();
       const response = await fetch("/api/private-scoped", {
         headers: {
@@ -115,8 +118,48 @@ const logout = () => {
   
       // Fetch the JSON result and append it to the DOM
       const responseData = await response.json();
+      console.log(responseData);
+     
+
+      // Gets ALL Clients IDs and stores in Array
+      function getClientIDs() {
+      let clientApps = responseData["clientNames_clientID"];
+      // console.log(clientApps)
+      for(let i = 0; i < clientApps.length; i++) {
+        clientsIDs.push(`${clientApps[i][1]}`);
+      }
+      return clientsIDs;
+      }
+      getClientIDs();
+
+      // Gets all the CODE from the actions
+      function getActionCode() {
+        for (let i = 0; i < responseData["actionNames"].length; i++) {
+          actionsCode.push(responseData["actionNames"][i]["code"]);
+        }
+        return actionsCode;
+      }
+      getActionCode();
+
+
+      // Compares Client IDs to Actions and generates a hashtable 
+      function createHash() {
+        for (let i = 0; i < clientsIDs.length; i++) {
+          let currentClient = clientsIDs[i];
+            for (let j = 0; j < actionsCode.length; j++) {
+             if (actionsCode[j].includes(currentClient)) {
+               resultsHash[currentClient] = responseData["actionNames"][j]["Action Name"]
+            } 
+          }
+        }
+      }
+      createHash()
+
       const responseElement = document.getElementById("api-call-result");
       responseElement.innerText = JSON.stringify(await responseData, {}, 2);
+
+      const dataDiv = document.getElementById("data-div");
+      dataDiv.innerText = JSON.stringify(await resultsHash, {}, 2);
   
   } catch (e) {
       console.error(e);

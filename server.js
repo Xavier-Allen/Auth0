@@ -75,7 +75,8 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
     let apps = clients.data
     for(let i = 0; i < apps.length; i++) {
       let appNames = apps[i]["name"];
-       appNamesArr.push(appNames);
+      let appId = apps[i]["client_id"];
+       appNamesArr.push([appNames, appId]);
     }
     return appNamesArr;
   }
@@ -94,7 +95,7 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
     let actions = await axios.request(actionsOptions);
     let apps = actions.data["actions"];
     for(let i = 0; i < apps.length; i++) {
-      let actionName_Triggers = {"Action Name" : apps[i]["name"], "Supported Triggers" : apps[i]["supported_triggers"][0].id}
+      let actionName_Triggers = {"Action Name" : apps[i]["name"], "Supported Triggers" : apps[i]["supported_triggers"][0].id, code: apps[i]["code"]}
       actionTriggers.push(actionName_Triggers);
     }
   
@@ -110,8 +111,8 @@ app.get( '/api/private-scoped', checkJwt, checkScopes, function ( req, res ) {
 
  // Returns the application names and actions/triggers in JSON format
   res.json({
+    clientNames_clientID: clientNames,
     actionNames: actionNames,
-    clientNames: clientNames
   })
 });
 
