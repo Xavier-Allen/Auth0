@@ -142,7 +142,8 @@ const logout = () => {
       getActionCode();
 
 
-      // Compares Client IDs to Actions and generates a hashtable 
+      // Compares Client IDs to Actions and generates a hashtable
+      // Hashtable key equals the ClientID the value equals the Action Name
       function createHash() {
         for (let i = 0; i < clientsIDs.length; i++) {
           let arrResult = [];
