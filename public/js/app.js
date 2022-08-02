@@ -145,10 +145,19 @@ const logout = () => {
       // Compares Client IDs to Actions and generates a hashtable 
       function createHash() {
         for (let i = 0; i < clientsIDs.length; i++) {
+          let arrResult = [];
           let currentClient = clientsIDs[i];
+
             for (let j = 0; j < actionsCode.length; j++) {
-             if (actionsCode[j].includes(currentClient)) {
-               resultsHash[currentClient] = responseData["actionNames"][j]["Action Name"]
+              
+              if (resultsHash[currentClient] && actionsCode[j].includes(currentClient)) {
+                arrResult.push(responseData["actionNames"][j]["Action Name"]);
+                resultsHash[currentClient] = arrResult;
+                console.log(resultsHash); 
+              } 
+              else if (actionsCode[j].includes(currentClient)) {
+               arrResult.push(responseData["actionNames"][j]["Action Name"]);
+               resultsHash[currentClient] = arrResult;
             } 
           }
         }
